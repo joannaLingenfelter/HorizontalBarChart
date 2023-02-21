@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		173CFA5529A50D810034B97E /* WorkoutTestChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173CFA5429A50D810034B97E /* WorkoutTestChart.swift */; };
 		1781EF45299EB5AC008DB7AC /* HorizontalBarChartApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1781EF44299EB5AC008DB7AC /* HorizontalBarChartApp.swift */; };
 		1781EF47299EB5AC008DB7AC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1781EF46299EB5AC008DB7AC /* ContentView.swift */; };
 		1781EF49299EB5AD008DB7AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1781EF48299EB5AD008DB7AC /* Assets.xcassets */; };
@@ -14,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		173CFA5429A50D810034B97E /* WorkoutTestChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTestChart.swift; sourceTree = "<group>"; };
 		1781EF41299EB5AC008DB7AC /* HorizontalBarChart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HorizontalBarChart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1781EF44299EB5AC008DB7AC /* HorizontalBarChartApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalBarChartApp.swift; sourceTree = "<group>"; };
 		1781EF46299EB5AC008DB7AC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 			children = (
 				1781EF44299EB5AC008DB7AC /* HorizontalBarChartApp.swift */,
 				1781EF46299EB5AC008DB7AC /* ContentView.swift */,
+				173CFA5429A50D810034B97E /* WorkoutTestChart.swift */,
 				1781EF48299EB5AD008DB7AC /* Assets.xcassets */,
 				1781EF4A299EB5AD008DB7AC /* Preview Content */,
 			);
@@ -138,6 +141,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1781EF47299EB5AC008DB7AC /* ContentView.swift in Sources */,
+				173CFA5529A50D810034B97E /* WorkoutTestChart.swift in Sources */,
 				1781EF45299EB5AC008DB7AC /* HorizontalBarChartApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

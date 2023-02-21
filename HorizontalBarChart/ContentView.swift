@@ -11,7 +11,7 @@ import Charts
 enum PaymentType: String {
     case plan
     case cardSpend
-
+    
     var appearance: BarMarkAppearance {
         switch self {
         case .plan:
@@ -39,11 +39,16 @@ struct BarInfo: Identifiable {
     let range: ClosedRange<Double>
 }
 
+struct Payment {
+    let type: PaymentType
+    let amount: Double
+}
+
 struct PaymentSummary {
     let bars: [BarInfo]
     let total: Double
 
-    init(payments: [PaymentType: Double]) {
+    init(payments: [Payment]) {
         self = PaymentSummary.createBars(payments: payments)
     }
 
@@ -52,16 +57,17 @@ struct PaymentSummary {
         self.total = total
     }
 
-    private static func createBars(payments: [PaymentType: Double]) -> PaymentSummary {
-        let total = payments.values.reduce(0, +)
-        let spacing = map(1.0, from: 0...100, to: 0...total)
+    private static func createBars(payments: [Payment]) -> PaymentSummary {
+        let total = payments.map(\.amount).reduce(0, +)
+        print("TOTAL: \(total)")
+        let spacing = map(1.0, from: 0...100, to: 0...total) // need this to be a max of a minimum and the total
         let minBarWidth = map(2.0, from: 0...100, to: 0...total)
 
         var bars: [BarInfo] = []
 
-        for (payment, total) in payments {
+        for payment in payments {
             var xStart = 0.0
-            var aggregateTotal = max(total, minBarWidth)
+            var aggregateTotal = max(payment.amount, minBarWidth)
 
             if let last = bars.last {
                 xStart = last.range.upperBound + spacing
@@ -69,13 +75,19 @@ struct PaymentSummary {
             }
 
             let bar = BarInfo(
-                id: payment.rawValue,
-                total: .init(value: total, displayValue: aggregateTotal),
-                appearance: payment.appearance,
+                id: payment.type.rawValue,
+                total: .init(value: payment.amount, displayValue: aggregateTotal),
+                appearance: payment.type.appearance,
                 range: xStart...aggregateTotal
             )
 
             bars.append(bar)
+
+            print("\(bar.id) xStart: \(xStart)")
+            print("\(bar.id) aggregateTotal: \(aggregateTotal)")
+            print("\(bar.id) lowerBound: \(bar.range.lowerBound)")
+            print("\(bar.id) upperBound: \(bar.range.upperBound)")
+            print("\(bar.id) paymentAmount: \(bar.total)")
         }
 
         return .init(payments: bars, total: total)
@@ -91,7 +103,12 @@ struct ContentView: View {
     @State var planTotal: Double = 0.0
 
     var summary: PaymentSummary {
-        PaymentSummary(payments: [.cardSpend: cardSpendTotal, .plan: planTotal])
+        PaymentSummary(
+            payments: [
+            .init(type: .plan, amount: planTotal),
+            .init(type: .cardSpend, amount: cardSpendTotal)
+            ]
+        )
     }
 
     var body: some View {
@@ -102,19 +119,22 @@ struct ContentView: View {
                     Spacer()
                     detailsButton()
                 }
+
                 chart()
                     .frame(height: 50)
             }
 
             VStack(spacing: 15) {
                 VStack(alignment: .leading) {
-                    Text("Card Spend")
-                    Slider(value: $cardSpendTotal.animation(), in: 0...1000)
+                    Text("Plan: \(planTotal.formatted(.currency(code: "USD")))")
+                    Slider(value: $planTotal.animation(), in: 0...1000)
+                        .tint(.yellow)
                 }
 
                 VStack(alignment: .leading) {
-                    Text("Plan")
-                    Slider(value: $planTotal.animation(), in: 0...1000)
+                    Text("Card Spend: \(cardSpendTotal.formatted(.currency(code: "USD")))")
+                    Slider(value: $cardSpendTotal.animation(), in: 0...1000)
+                        .tint(.blue)
                 }
             }
         }
@@ -139,12 +159,20 @@ struct ContentView: View {
     func chart() -> some View {
         Chart {
             ForEach(summary.bars) { bar in
-                BarMark(xStart: .value(bar.id, bar.range.lowerBound), xEnd: .value(bar.id, bar.range.upperBound))
-                    .foregroundStyle(bar.appearance.color)
-                    .symbol(.circle)
+                BarMark(xStart: .value("Total", bar.range.lowerBound), xEnd: .value("Total", bar.range.upperBound))
+                    .foregroundStyle(by: .value("PaymentType", bar.id))
+                    .symbol(by: .value("PaymentType", bar.id))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
             }
         }
+        .chartForegroundStyleScale([
+            "plan" : .yellow,
+            "cardSpend" : .blue
+        ])
+        .chartSymbolScale([
+            "plan" : .square,
+            "cardSpend" : .circle
+        ])
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
     }

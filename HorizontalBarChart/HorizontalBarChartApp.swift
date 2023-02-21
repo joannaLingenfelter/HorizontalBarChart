@@ -12,6 +12,7 @@ struct HorizontalBarChartApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+            //OtherView()
         }
     }
 }
