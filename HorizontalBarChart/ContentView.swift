@@ -8,127 +8,6 @@
 import SwiftUI
 import Charts
 
-enum PaymentType: String, Plottable {
-    case plan
-    case cardSpend
-
-    var name: String {
-        switch self {
-        case .plan:
-            return "Plan payment"
-        case .cardSpend:
-            return "Card spend"
-        }
-    }
-    
-    var appearance: BarMarkAppearance {
-        switch self {
-        case .plan:
-            return BarMarkAppearance(color: .yellow, symbol: .circle)
-        case .cardSpend:
-            return BarMarkAppearance(color: .blue, symbol: .square)
-        }
-    }
-}
-
-struct BarMarkAppearance {
-    let color: Color
-    let symbol: BasicChartSymbolShape
-}
-
-struct DuplicitousValue {
-    let value: Double
-    let displayValue: Double
-}
-
-struct BarInfo: Identifiable {
-    let paymentType: PaymentType
-    let total: DuplicitousValue
-    let range: ClosedRange<Double>
-
-    var id: String {
-        paymentType.rawValue
-    }
-}
-
-struct Payment {
-    let type: PaymentType
-    let amount: Double
-}
-
-struct PaymentSummary {
-    let bars: [BarInfo]
-    let total: Double
-
-    init(payments: [Payment]) {
-        self = PaymentSummary.createBars(payments: payments)
-    }
-
-    private init(payments: [BarInfo], total: Double) {
-        self.bars = payments
-        self.total = total
-    }
-
-    private static func createBars(payments: [Payment]) -> PaymentSummary {
-        let total = payments.map(\.amount).reduce(0, +)
-        print("TOTAL: \(total)")
-        let spacing = map(1.0, from: 0...100, to: 0...total) // need this to be a max of a minimum and the total
-        let minBarWidth = map(2.0, from: 0...100, to: 0...total)
-
-        var bars: [BarInfo] = []
-
-        for payment in payments {
-            var xStart = 0.0
-            var aggregateTotal = max(payment.amount, minBarWidth)
-
-            if let last = bars.last {
-                xStart = last.range.upperBound + spacing
-                aggregateTotal += (last.total.displayValue + spacing)
-            }
-
-            let bar = BarInfo(
-                paymentType: payment.type,
-                total: .init(value: payment.amount, displayValue: aggregateTotal),
-                range: xStart...aggregateTotal
-            )
-
-            bars.append(bar)
-
-            print("\(bar.id) xStart: \(xStart)")
-            print("\(bar.id) aggregateTotal: \(aggregateTotal)")
-            print("\(bar.id) lowerBound: \(bar.range.lowerBound)")
-            print("\(bar.id) upperBound: \(bar.range.upperBound)")
-            print("\(bar.id) paymentAmount: \(bar.total)")
-        }
-
-        return .init(payments: bars, total: total)
-    }
-
-    func foregroundStyleScale() -> KeyValuePairs<PaymentType, any ShapeStyle>  {
-        var dictionary = bars.reduce(into: [:]) { partialResult, bar in
-            partialResult[bar.paymentType] = bar.paymentType.appearance.symbol
-        }
-
-        return KeyValuePairs(dictionaryLiteral: dictionary)
-    }
-
-    func symbolScale() -> KeyValuePairs<Plotta, BasicChartSymbolShape> {
-        var dictionary: [PaymentType: BasicChartSymbolShape] = bars.reduce(into: [:]) { partialResult, bar in
-            partialResult[bar.paymentType] = bar.paymentType.appearance.symbol
-        }
-
-        var thing = bars.reduce(into: [(String, BasicChartSymbolShape)]()) { partialResult, bar in
-            partialResult.append((bar.paymentType, bar.paymentType.appearance.symbol))
-        }
-
-        return KeyValuePairs(dictionaryLiteral: thing)
-    }
-}
-
-func map(_ value: Double, from input: ClosedRange<Double>, to output: ClosedRange<Double>) -> Double {
-    return (value - input.lowerBound) * (output.upperBound - output.lowerBound) / (input.upperBound - input.lowerBound) + output.lowerBound
-}
-
 struct ContentView: View {
     @State var cardSpendTotal: Double = 0.0
     @State var planTotal: Double = 0.0
@@ -192,15 +71,19 @@ struct ContentView: View {
         Chart {
             ForEach(summary.bars) { bar in
                 BarMark(xStart: .value("Total", bar.range.lowerBound), xEnd: .value("Total", bar.range.upperBound))
-                    .foregroundStyle(by: .value("PaymentType", bar.paymentType.name))
-                    .symbol(by: .value("PaymentType", bar.paymentType.name))
+                    .foregroundStyle(by: .value("PaymentType", bar.paymentType))
+                    .symbol(by: .value("PaymentType", bar.paymentType))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .accessibilityLabel("\(bar.paymentType.name) total")
                     .accessibilityValue(Text(bar.total.value, format: .currency(code: "USD")))
             }
         }
-        .chartForegroundStyleScale(summary.foregroundStyleScale())
-        .chartSymbolScale(summary.symbolScale())
+        .chartForegroundStyleScale { (value: PaymentType) in
+            value.appearance.color
+        }
+        .chartSymbolScale { (value: PaymentType) in
+            value.appearance.symbol
+        }
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
     }
