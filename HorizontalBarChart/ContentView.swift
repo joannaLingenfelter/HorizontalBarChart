@@ -8,9 +8,18 @@
 import SwiftUI
 import Charts
 
-enum PaymentType: String {
+enum PaymentType: String, Plottable {
     case plan
     case cardSpend
+
+    var name: String {
+        switch self {
+        case .plan:
+            return "Plan payment"
+        case .cardSpend:
+            return "Card spend"
+        }
+    }
     
     var appearance: BarMarkAppearance {
         switch self {
@@ -33,10 +42,13 @@ struct DuplicitousValue {
 }
 
 struct BarInfo: Identifiable {
-    let id: String
+    let paymentType: PaymentType
     let total: DuplicitousValue
-    let appearance: BarMarkAppearance
     let range: ClosedRange<Double>
+
+    var id: String {
+        paymentType.rawValue
+    }
 }
 
 struct Payment {
@@ -75,9 +87,8 @@ struct PaymentSummary {
             }
 
             let bar = BarInfo(
-                id: payment.type.rawValue,
+                paymentType: payment.type,
                 total: .init(value: payment.amount, displayValue: aggregateTotal),
-                appearance: payment.type.appearance,
                 range: xStart...aggregateTotal
             )
 
@@ -91,6 +102,26 @@ struct PaymentSummary {
         }
 
         return .init(payments: bars, total: total)
+    }
+
+    func foregroundStyleScale() -> KeyValuePairs<PaymentType, any ShapeStyle>  {
+        var dictionary = bars.reduce(into: [:]) { partialResult, bar in
+            partialResult[bar.paymentType] = bar.paymentType.appearance.symbol
+        }
+
+        return KeyValuePairs(dictionaryLiteral: dictionary)
+    }
+
+    func symbolScale() -> KeyValuePairs<Plotta, BasicChartSymbolShape> {
+        var dictionary: [PaymentType: BasicChartSymbolShape] = bars.reduce(into: [:]) { partialResult, bar in
+            partialResult[bar.paymentType] = bar.paymentType.appearance.symbol
+        }
+
+        var thing = bars.reduce(into: [(String, BasicChartSymbolShape)]()) { partialResult, bar in
+            partialResult.append((bar.paymentType, bar.paymentType.appearance.symbol))
+        }
+
+        return KeyValuePairs(dictionaryLiteral: thing)
     }
 }
 
@@ -143,36 +174,33 @@ struct ContentView: View {
     }
 
     func detailsButton() -> some View {
-        Button("Details") {
-
-        }
+        Button("Details") {}
     }
 
     func chartHeader() -> some View {
         VStack(alignment: .leading) {
             Text(summary.total, format: .currency(code: "USD"))
                 .fontWeight(.bold)
-            Text("Due Feb 1st")
+            Text(Date.now, format: .dateTime.day(.defaultDigits).month())
         }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Total amount owed on") + Text(Date.now, format: .dateTime.day(.defaultDigits).month()))
+        .accessibilityValue(Text(summary.total, format: .currency(code: "USD")))
     }
 
     func chart() -> some View {
         Chart {
             ForEach(summary.bars) { bar in
                 BarMark(xStart: .value("Total", bar.range.lowerBound), xEnd: .value("Total", bar.range.upperBound))
-                    .foregroundStyle(by: .value("PaymentType", bar.id))
-                    .symbol(by: .value("PaymentType", bar.id))
+                    .foregroundStyle(by: .value("PaymentType", bar.paymentType.name))
+                    .symbol(by: .value("PaymentType", bar.paymentType.name))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .accessibilityLabel("\(bar.paymentType.name) total")
+                    .accessibilityValue(Text(bar.total.value, format: .currency(code: "USD")))
             }
         }
-        .chartForegroundStyleScale([
-            "plan" : .yellow,
-            "cardSpend" : .blue
-        ])
-        .chartSymbolScale([
-            "plan" : .square,
-            "cardSpend" : .circle
-        ])
+        .chartForegroundStyleScale(summary.foregroundStyleScale())
+        .chartSymbolScale(summary.symbolScale())
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
     }
