@@ -31,7 +31,7 @@ struct ContentView: View {
                 }
 
                 chart()
-                    .frame(height: 50)
+                    .frame(height: 75)
             }
 
             VStack(spacing: 15) {
@@ -63,30 +63,53 @@ struct ContentView: View {
             Text(Date.now, format: .dateTime.day(.defaultDigits).month())
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Total amount owed on") + Text(Date.now, format: .dateTime.day(.defaultDigits).month()))
-        .accessibilityValue(Text(summary.total, format: .currency(code: "USD")))
+        .accessibilityLabel(
+            Text(summary.total, format: .currency(code: "USD")) +
+            Text("owed on") +
+            Text(Date.now, format: .dateTime.day(.defaultDigits).month())
+        )
     }
 
     func chart() -> some View {
-//        GeometryReader { geo in
-            Chart {
-                ForEach(summary.bars) { bar in
-                    barContent(bar)
+        Chart {
+            ForEach(summary.bars) { bar in
+                barContent(bar)
+            }
+            ForEach(summary.spacebars) { bar in
+                barContent(bar)
+            }
+        }
+        .chartForegroundStyleScale { (value: PaymentType) in
+            value.appearance.color
+        }
+        .chartLegend(position: .bottom) {
+            ViewThatFits(in: .horizontal) {
+                HStack {
+                    legend()
                 }
-                ForEach(summary.spacebars) { bar in
-                    barContent(bar)
+
+                VStack(alignment: .leading) {
+                    legend()
                 }
             }
-            .chartForegroundStyleScale { (value: PaymentType) in
-                value.appearance.color
+            .accessibilityHidden(true)
+        }
+        .chartXAxis(.hidden)
+        .chartYAxis(.hidden)
+    }
+
+    private func legend() -> some View {
+        ForEach(summary.bars) { (bar: PaymentBarModel) in
+            HStack {
+                bar.value.appearance.symbol
+                    .fill(bar.value.appearance.color)
+                    .aspectRatio(1.0, contentMode: .fit)
+                    .frame(height: 15)
+
+                Text(bar.value.name)
+                    .foregroundColor(.black)
             }
-            .chartSymbolScale { (value: PaymentType) in
-                value.appearance.symbol
-            }
-            .chartXAxis(.hidden)
-            .chartYAxis(.hidden)
-//            .chartXScale(range: 0...geo.size.width, type: .none)
-//        }
+        }
     }
 
     @ChartContentBuilder
@@ -94,7 +117,6 @@ struct ContentView: View {
         BarMark(xStart: .value("Total", bar.range.lowerBound),
                 xEnd: .value("Total", bar.range.upperBound))
         .foregroundStyle(by: .value("Payment Type", bar.value))
-        .symbol(by: .value("Payment Type", bar.value))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .accessibilityLabel("\(bar.value.name) total")
         .accessibilityValue(Text(bar.total.value, format: .currency(code: "USD")))
@@ -104,8 +126,6 @@ struct ContentView: View {
     private func barContent(_ bar: SpacerBarModel) -> some ChartContent {
         BarMark(xStart: .value("Total", bar.range.lowerBound),
                 xEnd: .value("Total", bar.range.upperBound))
-//        .foregroundStyle(by: .value("Noop", bar.value))
-//        .symbol(by: .value("Noop", bar.value))
         .accessibilityHidden(true)
         .opacity(0.0)
     }

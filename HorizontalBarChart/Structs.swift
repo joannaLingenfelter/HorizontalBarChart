@@ -73,12 +73,11 @@ struct PaymentSummary {
 
         let total = DuplicitousValue(value: rawTotal, displayValue: isEmptyState ? 500.0 : rawTotal)
 
-        print("TOTAL: \(total)")
-        let spacing = map(1.0, from: 0...100, to: 0...total.displayValue) // need this to be a max of a minimum and the total
+        let spacing = map(1.0, from: 0...100, to: 0...total.displayValue)
         let minBarWidth = map(2.0, from: 0...100, to: 0...total.displayValue)
 
         var bars: [PaymentBarModel] = []
-
+        
         var aggregateDisplayTotal = 0.0
 
         for payment in payments {
@@ -97,12 +96,6 @@ struct PaymentSummary {
             )
 
             bars.append(bar)
-
-            print("\(bar.id) xStart: \(xStart)")
-            print("\(bar.id) aggregateTotal: \(aggregateDisplayTotal)")
-            print("\(bar.id) lowerBound: \(bar.range.lowerBound)")
-            print("\(bar.id) upperBound: \(bar.range.upperBound)")
-            print("\(bar.id) paymentAmount: \(bar.total)")
         }
 
         var spacebars: [SpacerBarModel] = []

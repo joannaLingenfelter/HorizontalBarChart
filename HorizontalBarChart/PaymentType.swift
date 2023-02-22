@@ -15,16 +15,11 @@ enum SpacerBarMark: String, Plottable {
 
 enum PaymentType: String, Plottable {
 
-    case plan
-    case cardSpend
+    case plan = "Plans payment "
+    case cardSpend = "Card spend"
 
     var name: String {
-        switch self {
-        case .plan:
-            return "Plan payment"
-        case .cardSpend:
-            return "Card spend"
-        }
+        rawValue
     }
 
     var appearance: BarMarkAppearance {
