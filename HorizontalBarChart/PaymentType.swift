@@ -9,6 +9,10 @@ import Foundation
 import SwiftUI
 import Charts
 
+enum SpacerBarMark: String, Plottable {
+    case trailing
+}
+
 enum PaymentType: String, Plottable {
 
     case plan

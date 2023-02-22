@@ -68,24 +68,46 @@ struct ContentView: View {
     }
 
     func chart() -> some View {
-        Chart {
-            ForEach(summary.bars) { bar in
-                BarMark(xStart: .value("Total", bar.range.lowerBound), xEnd: .value("Total", bar.range.upperBound))
-                    .foregroundStyle(by: .value("PaymentType", bar.paymentType))
-                    .symbol(by: .value("PaymentType", bar.paymentType))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .accessibilityLabel("\(bar.paymentType.name) total")
-                    .accessibilityValue(Text(bar.total.value, format: .currency(code: "USD")))
+//        GeometryReader { geo in
+            Chart {
+                ForEach(summary.bars) { bar in
+                    barContent(bar)
+                }
+                ForEach(summary.spacebars) { bar in
+                    barContent(bar)
+                }
             }
-        }
-        .chartForegroundStyleScale { (value: PaymentType) in
-            value.appearance.color
-        }
-        .chartSymbolScale { (value: PaymentType) in
-            value.appearance.symbol
-        }
-        .chartXAxis(.hidden)
-        .chartYAxis(.hidden)
+            .chartForegroundStyleScale { (value: PaymentType) in
+                value.appearance.color
+            }
+            .chartSymbolScale { (value: PaymentType) in
+                value.appearance.symbol
+            }
+            .chartXAxis(.hidden)
+            .chartYAxis(.hidden)
+//            .chartXScale(range: 0...geo.size.width, type: .none)
+//        }
+    }
+
+    @ChartContentBuilder
+    private func barContent(_ bar: PaymentBarModel) -> some ChartContent {
+        BarMark(xStart: .value("Total", bar.range.lowerBound),
+                xEnd: .value("Total", bar.range.upperBound))
+        .foregroundStyle(by: .value("Payment Type", bar.value))
+        .symbol(by: .value("Payment Type", bar.value))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .accessibilityLabel("\(bar.value.name) total")
+        .accessibilityValue(Text(bar.total.value, format: .currency(code: "USD")))
+    }
+
+    @ChartContentBuilder
+    private func barContent(_ bar: SpacerBarModel) -> some ChartContent {
+        BarMark(xStart: .value("Total", bar.range.lowerBound),
+                xEnd: .value("Total", bar.range.upperBound))
+//        .foregroundStyle(by: .value("Noop", bar.value))
+//        .symbol(by: .value("Noop", bar.value))
+        .accessibilityHidden(true)
+        .opacity(0.0)
     }
 }
 

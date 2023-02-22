@@ -19,13 +19,29 @@ struct DuplicitousValue {
     let displayValue: Double
 }
 
-struct BarInfo: Identifiable {
-    let paymentType: PaymentType
+protocol BarRepresentable: Identifiable {
+    associatedtype Value: Plottable & RawRepresentable
+    var value: Value { get }
+    var total: DuplicitousValue { get }
+    var range: ClosedRange<Double> { get }
+    var id: String { get }
+}
+
+struct PaymentBarModel: BarRepresentable {
+    let value: PaymentType
     let total: DuplicitousValue
     let range: ClosedRange<Double>
+}
 
+struct SpacerBarModel: BarRepresentable {
+    var value: SpacerBarMark
+    var total: DuplicitousValue
+    var range: ClosedRange<Double>
+}
+
+extension BarRepresentable where Value.RawValue == String {
     var id: String {
-        paymentType.rawValue
+        value.rawValue
     }
 }
 
@@ -35,50 +51,73 @@ struct Payment {
 }
 
 struct PaymentSummary {
-    let bars: [BarInfo]
+    let bars: [PaymentBarModel]
+    let spacebars: [SpacerBarModel]
+
     let total: Double
 
     init(payments: [Payment]) {
         self = PaymentSummary.createBars(payments: payments)
     }
 
-    private init(payments: [BarInfo], total: Double) {
+    private init(payments: [PaymentBarModel], spacebars: [SpacerBarModel], total: Double) {
         self.bars = payments
+        self.spacebars = spacebars
         self.total = total
     }
 
     private static func createBars(payments: [Payment]) -> PaymentSummary {
-        let total = payments.map(\.amount).reduce(0, +)
-        print("TOTAL: \(total)")
-        let spacing = map(1.0, from: 0...100, to: 0...total) // need this to be a max of a minimum and the total
-        let minBarWidth = map(2.0, from: 0...100, to: 0...total)
+        let rawTotal = payments.map(\.amount).reduce(0, +)
 
-        var bars: [BarInfo] = []
+        let isEmptyState = rawTotal.isZero
+
+        let total = DuplicitousValue(value: rawTotal, displayValue: isEmptyState ? 500.0 : rawTotal)
+
+        print("TOTAL: \(total)")
+        let spacing = map(1.0, from: 0...100, to: 0...total.displayValue) // need this to be a max of a minimum and the total
+        let minBarWidth = map(2.0, from: 0...100, to: 0...total.displayValue)
+
+        var bars: [PaymentBarModel] = []
+
+        var aggregateDisplayTotal = 0.0
 
         for payment in payments {
             var xStart = 0.0
-            var aggregateTotal = max(payment.amount, minBarWidth)
-
+            aggregateDisplayTotal = max(payment.amount, minBarWidth)
+            
             if let last = bars.last {
                 xStart = last.range.upperBound + spacing
-                aggregateTotal += (last.total.displayValue + spacing)
+                aggregateDisplayTotal += (last.total.displayValue + spacing)
             }
 
-            let bar = BarInfo(
-                paymentType: payment.type,
-                total: .init(value: payment.amount, displayValue: aggregateTotal),
-                range: xStart...aggregateTotal
+            let bar = PaymentBarModel(
+                value: payment.type,
+                total: .init(value: payment.amount, displayValue: aggregateDisplayTotal),
+                range: xStart...aggregateDisplayTotal
             )
 
             bars.append(bar)
 
             print("\(bar.id) xStart: \(xStart)")
-            print("\(bar.id) aggregateTotal: \(aggregateTotal)")
+            print("\(bar.id) aggregateTotal: \(aggregateDisplayTotal)")
             print("\(bar.id) lowerBound: \(bar.range.lowerBound)")
             print("\(bar.id) upperBound: \(bar.range.upperBound)")
             print("\(bar.id) paymentAmount: \(bar.total)")
         }
 
-        return .init(payments: bars, total: total)
+        var spacebars: [SpacerBarModel] = []
+
+        if isEmptyState {
+
+            var xStart = 0.0
+            if let last = bars.last {
+                xStart = last.range.upperBound + spacing
+                aggregateDisplayTotal += (last.total.displayValue + spacing)
+            }
+
+            spacebars.append(SpacerBarModel(value: .trailing, total: .init(value: 0.0, displayValue: total.displayValue - aggregateDisplayTotal), range: xStart...total.displayValue))
+        }
+
+        return .init(payments: bars, spacebars: spacebars, total: total.value)
     }
 }
