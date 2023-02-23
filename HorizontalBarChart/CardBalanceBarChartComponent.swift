@@ -12,6 +12,12 @@ struct CardBalanceBarChartComponent: View {
     private var summary: PaymentSummary
     private var detailsAction: () -> ()
 
+    @ScaledMetric(relativeTo: .largeTitle)
+    var headerVerticalStackSpacing: CGFloat = 5
+
+    @ScaledMetric(relativeTo: .largeTitle)
+    private var chartContentSpacing: CGFloat = 10
+
     init(
         payments: [Payment],
         detailsAction: @escaping () -> ()
@@ -21,30 +27,44 @@ struct CardBalanceBarChartComponent: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading) {
-            HStack(alignment: .top) {
-                chartHeader()
-                Spacer()
-                detailsButton()
+            VStack(alignment: .leading, spacing: chartContentSpacing) {
+                header()
+                chart()
+                    .frame(height: 30)
+                legend()
             }
-            chart()
-        }
-        .padding()
-        .scenePadding()
+            .padding()
+            .scenePadding()
     }
 
-    func detailsButton() -> some View {
+    private func detailsButton() -> some View {
         // TODO: Style font
         Button("Details") {
             detailsAction()
         }
     }
 
-    func chartHeader() -> some View {
-        VStack(alignment: .leading) {
+    private func header() -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top) {
+                chartHeaderContent()
+                Spacer()
+                detailsButton()
+            }
+
+            VStack(alignment: .leading, spacing: headerVerticalStackSpacing) {
+                chartHeaderContent()
+                detailsButton()
+            }
+        }
+    }
+
+    func chartHeaderContent() -> some View {
+        VStack(alignment: .leading, spacing: headerVerticalStackSpacing) {
             // TODO: Style font
             Text(summary.total, format: .currency(code: "USD"))
                 .fontWeight(.bold)
+                .lineLimit(1)
             Text(Date.now, format: .dateTime.day(.defaultDigits).month())
         }
         .accessibilityElement(children: .ignore)
@@ -67,23 +87,25 @@ struct CardBalanceBarChartComponent: View {
         .chartForegroundStyleScale { (value: PaymentType) in
             value.appearance.color
         }
-        .chartLegend(position: .bottom) {
-            ViewThatFits(in: .horizontal) {
-                HStack {
-                    legend()
-                }
-
-                VStack(alignment: .leading) {
-                    legend()
-                }
-            }
-            .accessibilityHidden(true)
-        }
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
+        .chartLegend(.hidden)
     }
 
     private func legend() -> some View {
+        ViewThatFits {
+            HStack {
+                legendContent()
+            }
+
+            VStack(alignment: .leading) {
+                legendContent()
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
+    private func legendContent() -> some View {
         ForEach(summary.bars) { (bar: PaymentBarModel) in
             HStack {
                 bar.value.appearance.symbol
