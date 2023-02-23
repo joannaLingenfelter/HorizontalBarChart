@@ -17,7 +17,6 @@ struct HorizontalBarChartApp: App {
                     .init(type: .cardSpend, amount: 100)
                 ],
                 detailsAction: {})
-            //OtherView()
         }
     }
 }

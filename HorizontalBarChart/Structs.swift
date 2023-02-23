@@ -9,54 +9,13 @@ import Foundation
 import SwiftUI
 import Charts
 
-struct BarMarkAppearance {
-    let color: Color
-    let symbol: BasicChartSymbolShape
-}
-
-struct DuplicitousValue {
-    let value: Double
-    let displayValue: Double
-}
-
-protocol BarRepresentable: Identifiable {
-    associatedtype Value: Plottable & RawRepresentable
-    var value: Value { get }
-    var total: DuplicitousValue { get }
-    var range: ClosedRange<Double> { get }
-    var id: String { get }
-}
-
-struct PaymentBarModel: BarRepresentable {
-    let value: PaymentType
-    let total: DuplicitousValue
-    let range: ClosedRange<Double>
-}
-
-struct SpacerBarModel: BarRepresentable {
-    var value: SpacerBarMark
-    var total: DuplicitousValue
-    var range: ClosedRange<Double>
-}
-
-extension BarRepresentable where Value.RawValue == String {
-    var id: String {
-        value.rawValue
-    }
-}
-
-struct Payment {
-    let type: PaymentType
-    let amount: Double
-}
 
 struct PaymentSummary {
     let bars: [PaymentBarModel]
     let spacebars: [SpacerBarModel]
-
     let total: Double
 
-    init(payments: [Payment]) {
+    init(payments: [DisplayedPayment]) {
         self = PaymentSummary.createBars(payments: payments)
     }
 
@@ -66,7 +25,7 @@ struct PaymentSummary {
         self.total = total
     }
 
-    private static func createBars(payments: [Payment]) -> PaymentSummary {
+    private static func createBars(payments: [DisplayedPayment]) -> PaymentSummary {
         let rawTotal = payments.map(\.amount).reduce(0, +)
 
         let isEmptyState = rawTotal.isZero

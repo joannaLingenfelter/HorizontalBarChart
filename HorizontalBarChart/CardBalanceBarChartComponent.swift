@@ -19,7 +19,7 @@ struct CardBalanceBarChartComponent: View {
     private var chartContentSpacing: CGFloat = 10
 
     init(
-        payments: [Payment],
+        payments: [DisplayedPayment],
         detailsAction: @escaping () -> ()
     ) {
         self.summary = PaymentSummary(payments: payments)
@@ -89,11 +89,11 @@ struct CardBalanceBarChartComponent: View {
         }
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
-        .chartLegend(.hidden)
+        .chartLegend(.hidden) // Using the chart's legend enforces a minimum height on chart that cannot be overriden
     }
 
     private func legend() -> some View {
-        ViewThatFits {
+        ViewThatFits(in: .horizontal) {
             HStack {
                 legendContent()
             }
