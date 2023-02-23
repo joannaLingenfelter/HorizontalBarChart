@@ -11,7 +11,12 @@ import SwiftUI
 struct HorizontalBarChartApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CardBalanceBarChartComponent(
+                payments: [
+                    .init(type: .plan, amount: 200),
+                    .init(type: .cardSpend, amount: 100)
+                ],
+                detailsAction: {})
             //OtherView()
         }
     }

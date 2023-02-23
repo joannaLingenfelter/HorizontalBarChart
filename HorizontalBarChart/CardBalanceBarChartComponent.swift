@@ -8,56 +8,41 @@
 import SwiftUI
 import Charts
 
-struct ContentView: View {
-    @State var cardSpendTotal: Double = 0.0
-    @State var planTotal: Double = 0.0
+struct CardBalanceBarChartComponent: View {
+    private var summary: PaymentSummary
+    private var detailsAction: () -> ()
 
-    var summary: PaymentSummary {
-        PaymentSummary(
-            payments: [
-            .init(type: .plan, amount: planTotal),
-            .init(type: .cardSpend, amount: cardSpendTotal)
-            ]
-        )
+    init(
+        payments: [Payment],
+        detailsAction: @escaping () -> ()
+    ) {
+        self.summary = PaymentSummary(payments: payments)
+        self.detailsAction = detailsAction
     }
 
     var body: some View {
-        VStack(spacing: 50) {
-            VStack(alignment: .leading) {
-                HStack(alignment: .top) {
-                    chartHeader()
-                    Spacer()
-                    detailsButton()
-                }
-
-                chart()
-                    .frame(height: 75)
+        VStack(alignment: .leading) {
+            HStack(alignment: .top) {
+                chartHeader()
+                Spacer()
+                detailsButton()
             }
-
-            VStack(spacing: 15) {
-                VStack(alignment: .leading) {
-                    Text("Plan: \(planTotal.formatted(.currency(code: "USD")))")
-                    Slider(value: $planTotal.animation(), in: 0...1000)
-                        .tint(.yellow)
-                }
-
-                VStack(alignment: .leading) {
-                    Text("Card Spend: \(cardSpendTotal.formatted(.currency(code: "USD")))")
-                    Slider(value: $cardSpendTotal.animation(), in: 0...1000)
-                        .tint(.blue)
-                }
-            }
+            chart()
         }
         .padding()
         .scenePadding()
     }
 
     func detailsButton() -> some View {
-        Button("Details") {}
+        // TODO: Style font
+        Button("Details") {
+            detailsAction()
+        }
     }
 
     func chartHeader() -> some View {
         VStack(alignment: .leading) {
+            // TODO: Style font
             Text(summary.total, format: .currency(code: "USD"))
                 .fontWeight(.bold)
             Text(Date.now, format: .dateTime.day(.defaultDigits).month())
@@ -105,7 +90,7 @@ struct ContentView: View {
                     .fill(bar.value.appearance.color)
                     .aspectRatio(1.0, contentMode: .fit)
                     .frame(height: 15)
-
+                // TODO: Style Font
                 Text(bar.value.name)
                     .foregroundColor(.black)
             }
@@ -133,6 +118,11 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        CardBalanceBarChartComponent(
+            payments: [
+                .init(type: .plan, amount: 200),
+                .init(type: .cardSpend, amount: 100)
+            ],
+            detailsAction: {})
     }
 }

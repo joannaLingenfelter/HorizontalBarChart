@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		173CFA5529A50D810034B97E /* WorkoutTestChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 173CFA5429A50D810034B97E /* WorkoutTestChart.swift */; };
 		1781EF45299EB5AC008DB7AC /* HorizontalBarChartApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1781EF44299EB5AC008DB7AC /* HorizontalBarChartApp.swift */; };
-		1781EF47299EB5AC008DB7AC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1781EF46299EB5AC008DB7AC /* ContentView.swift */; };
+		1781EF47299EB5AC008DB7AC /* CardBalanceBarChartComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1781EF46299EB5AC008DB7AC /* CardBalanceBarChartComponent.swift */; };
 		1781EF49299EB5AD008DB7AC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1781EF48299EB5AD008DB7AC /* Assets.xcassets */; };
 		1781EF4C299EB5AD008DB7AC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1781EF4B299EB5AD008DB7AC /* Preview Assets.xcassets */; };
 		6BB63ACB29A6713800EE6F64 /* PaymentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB63ACA29A6713800EE6F64 /* PaymentType.swift */; };
@@ -21,7 +21,7 @@
 		173CFA5429A50D810034B97E /* WorkoutTestChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTestChart.swift; sourceTree = "<group>"; };
 		1781EF41299EB5AC008DB7AC /* HorizontalBarChart.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HorizontalBarChart.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1781EF44299EB5AC008DB7AC /* HorizontalBarChartApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HorizontalBarChartApp.swift; sourceTree = "<group>"; };
-		1781EF46299EB5AC008DB7AC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		1781EF46299EB5AC008DB7AC /* CardBalanceBarChartComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardBalanceBarChartComponent.swift; sourceTree = "<group>"; };
 		1781EF48299EB5AD008DB7AC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1781EF4B299EB5AD008DB7AC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		6BB63ACA29A6713800EE6F64 /* PaymentType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentType.swift; sourceTree = "<group>"; };
@@ -60,7 +60,7 @@
 			isa = PBXGroup;
 			children = (
 				1781EF44299EB5AC008DB7AC /* HorizontalBarChartApp.swift */,
-				1781EF46299EB5AC008DB7AC /* ContentView.swift */,
+				1781EF46299EB5AC008DB7AC /* CardBalanceBarChartComponent.swift */,
 				6BB63ACE29A6717A00EE6F64 /* Helpers.swift */,
 				6BB63ACA29A6713800EE6F64 /* PaymentType.swift */,
 				6BB63ACC29A6715A00EE6F64 /* Structs.swift */,
@@ -151,7 +151,7 @@
 			files = (
 				6BB63ACB29A6713800EE6F64 /* PaymentType.swift in Sources */,
 				6BB63ACF29A6717A00EE6F64 /* Helpers.swift in Sources */,
-				1781EF47299EB5AC008DB7AC /* ContentView.swift in Sources */,
+				1781EF47299EB5AC008DB7AC /* CardBalanceBarChartComponent.swift in Sources */,
 				173CFA5529A50D810034B97E /* WorkoutTestChart.swift in Sources */,
 				6BB63ACD29A6715A00EE6F64 /* Structs.swift in Sources */,
 				1781EF45299EB5AC008DB7AC /* HorizontalBarChartApp.swift in Sources */,
