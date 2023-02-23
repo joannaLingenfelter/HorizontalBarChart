@@ -6,6 +6,11 @@
 //
 
 import Foundation
+import Charts
+
+enum SpacerBarMark: String, Plottable {
+    case trailing
+}
 
 struct SpacerBarModel: BarRepresentable {
     var value: SpacerBarMark

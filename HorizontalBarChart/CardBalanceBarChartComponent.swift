@@ -27,14 +27,14 @@ struct CardBalanceBarChartComponent: View {
     }
 
     var body: some View {
-            VStack(alignment: .leading, spacing: chartContentSpacing) {
-                header()
-                chart()
-                    .frame(height: 30)
-                legend()
-            }
-            .padding()
-            .scenePadding()
+        VStack(alignment: .leading, spacing: chartContentSpacing) {
+            header()
+            chart()
+                .frame(height: 30)
+            legend()
+        }
+        .padding()
+        .scenePadding()
     }
 
     private func detailsButton() -> some View {

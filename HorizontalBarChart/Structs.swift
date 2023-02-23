@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 import Charts
 
-
 struct PaymentSummary {
     let bars: [PaymentBarModel]
     let spacebars: [SpacerBarModel]
